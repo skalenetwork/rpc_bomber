@@ -5,6 +5,7 @@
   "dependencies": {
     "json-rpc-2.0": "^1.4.2",
     "node-fetch": "v2",
-    "web3": "1.2.6"
+    "web3": "1.2.6",
+    "argparse": "^2.0.1"
   }
 }

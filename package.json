@@ -4,7 +4,7 @@
   "main": "rpc_bomber.js",
   "dependencies": {
     "json-rpc-2.0": "^1.4.2",
-    "node-fetch": "^3.3.0",
+    "node-fetch": "v2",
     "web3": "1.2.6"
   }
 }

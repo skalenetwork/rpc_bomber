@@ -1,0 +1,10 @@
+{
+  "name": "@skalenetwork/rpc_bomber",
+  "description": "Ethereum JSON-RPC bomber",
+  "main": "rpc_bomber.js",
+  "dependencies": {
+    "json-rpc-2.0": "^1.4.2",
+    "node-fetch": "^3.3.0",
+    "web3": "1.2.6"
+  }
+}

@@ -1,13 +1,18 @@
 # Ethereum JSON-RPC bomber
 
-A tool to send load to Etheraum JSON-RPC endpoint
+A tool to send load to your Ethereum JSON-RPC endpoint
 
 ## Installation
+
+### 1 Prepare source code
 ```
 git clone https://github.com/skalenetwork/rpc_bomber
 cd rpc_bomber
 npm install
 ```
+
+### 2 Prepare accounts
+Add 24000 accounts from `accounts.json` to your Ethereum client config (so they will have non-zero balances)
 
 ## Usage
 

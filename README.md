@@ -2,8 +2,17 @@
 
 A tool to send load to Etheraum JSON-RPC endpoint
 
+## Installation
 ```
-usage: rpc_bomber.js [-h] [-r | -t] [-a ACCOUNTS] [--from FROM] [-b BATCH] [-s SOCKETS] url
+git clone https://github.com/skalenetwork/rpc_bomber
+cd rpc_bomber
+npm install
+```
+
+## Usage
+
+```
+usage: node rpc_bomber.js [-h] [-r | -t] [-a ACCOUNTS] [--from FROM] [-b BATCH] [-s SOCKETS] url
 
 positional arguments:
   url                   endpoint URL to connect to (http://ip:port)

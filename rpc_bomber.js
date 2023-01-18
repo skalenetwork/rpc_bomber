@@ -139,7 +139,7 @@ async function bomb_transactions(){
 			'gas': 21000,
 			'gasPrice': '100000'
 		};
-		
+		//console.log(tr);
 		signed  = await web3.eth.accounts.signTransaction( tr, accounts[i].privateKey );
 		
 		try{
@@ -160,11 +160,8 @@ async function bomb_transactions(){
                 //console.log(ex.message);
                 
                 if(ex.message.includes("nonce")){
-                    //console.log(ex.message + " For account "+i+" Set "+nonces[i]+"->"+(nonces[i]+1));
-                    incr[nonces[i]]++;
-                    ++nonces[i];
+					nonces[i] = +await web3.eth.getTransactionCount(accounts[i].address);
                     nonce_counter++;
-                    //console.log(incr);
                 }
                 else if(ex.message.includes("Same transaction")){
                     sleep(1000+i*10);
@@ -190,6 +187,7 @@ async function bomb_transactions(){
                 
                 stats();
                 //submit(i);
+				//break;
 		}
 		
 		}//while

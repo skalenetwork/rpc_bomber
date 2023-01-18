@@ -166,9 +166,9 @@ async function bomb_transactions(){
                     nonce_counter++;
                     //console.log(incr);
                 }
-                if(ex.message.includes("Same transaction")){
+                else if(ex.message.includes("Same transaction")){
                     sleep(1000+i*10);
-		}
+				}
                 else if(ex.message.includes("timeout")){
                     timeout_counter++;
                 }

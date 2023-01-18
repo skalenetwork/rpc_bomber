@@ -19,30 +19,11 @@ let sockets;
 
 let BN = 1;		// for bomb_requests
 let batch;
+let bomb_request_name;	// eth_getBlock or web3_clientVersion
+
+let agent;		// for fetch
 
 const sleep = ( milliseconds ) => { return new Promise( resolve => setTimeout( resolve, milliseconds ) ); };
-
-const web3_options = {
-    timeout: 60000, // ms
-
-    clientConfig: {
-    keepalive: true,
-    keepaliveInterval: 60000 // ms
-    },
-
-    // Enable auto reconnection
-    reconnect: {
-        auto: true,
-        delay: 5000, // ms
-        maxAttempts: 50,
-        onTimeout: true
-    }
-};
-
-const agent = new http.Agent({
-    keepAlive: true,
-    maxSockets: sockets
-});
 
 /*
 const api = axios.create({
@@ -225,18 +206,26 @@ async function bomb_transactions(){
 
 async function bomb_requests(){
 
-    console.log("Bombing with getBlock requests in batches of " + batch);
-    
+    console.log("Bombing with " + bomb_request_name + " requests in batches of " + batch);
+
 	var recursive_batch;
 	var i = 0;
 	var error;
-		
+
 	//submitLoad().then(function(){console.log("success");});
 	//return;
-	
+
+    function eth_request(){
+		if(bomb_request_name=="eth_getBlock")
+			return web3.eth.getBlock(Math.ceil(Math.random()*BN), true);
+		else if(bomb_request_name=='web3_clientVersion')
+			return web3.eth.getNodeInfo();
+		else assert(false);
+	}
+
 	function recursive_batch(){		
 		for(var j=0; j<batch; ++j){
-			web3.eth.getBlock(Math.ceil(Math.random()*BN), true).then(function(res){
+			eth_request().then(function(res){
 				//console.log(res);
 			}).catch(function(ex){
 				if(!error)
@@ -271,15 +260,24 @@ async function main(){
 	});
 
 	let rt_group = parser.add_mutually_exclusive_group();
-	rt_group.add_argument('-r', {help: "bomb endpoint with getBlock requests", action: 'store_true'});
+	rt_group.add_argument('-r', {help: "bomb endpoint with eth_getBlock requests", action: 'store_true'});
 	rt_group.add_argument('-t', {help: "bomb endpoint with transactions", action: 'store_true'});
+	rt_group.add_argument('-l', {help: "bomb endpoint with light requests: web3_clientVersion", action: 'store_true'});
 	parser.add_argument('-a', '--accounts', {help: "number of accounts to use (<=24000)", default:1000});
 	parser.add_argument('--from', {help: "starting account number (<24000)", default:0});
-	parser.add_argument('-b', '--batch', {help: "number of getBlock requests executed in parallel", default:1000});
+	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel", default:1000});
 	parser.add_argument('-s', '--sockets', {help: "number of keepalive-sockets", default:1000000});
 	parser.add_argument('url', {help: "endpoint URL to connect to (http://ip:port)"});
 
 	let args=parser.parse_args();
+
+	sockets = +args.sockets;
+	console.log("Using maximum " + sockets + " sockets");
+
+	agent = new http.Agent({
+		    	keepAlive: true,
+    			maxSockets: sockets
+			});
 
     url = args.url;
 	console.log("Connecting to " + url);
@@ -290,13 +288,19 @@ async function main(){
 		
 	acc_from = +args.from;
 	
-	sockets = +args.sockets;
-	console.log("Using maximum " + sockets + " sockets");
-	
 	batch = +args.batch;
-	
+
+	let provider_options = {
+	    timeout: 60000, // ms
+
+		agent: {
+			http: agent,
+			baseUrl: url
+		}
+	};
+
 	console.log("Initializing web3");
-	web3 = new Web3(url, web3_options);
+	web3 = new Web3(new Web3.providers.HttpProvider('/', provider_options));
 
 	bn = await web3.eth.getBlock("latest", true);
 	bn = bn.number;
@@ -307,6 +311,11 @@ async function main(){
 	console.log("chainId = " + chainId);
 	
 	if(args.r){
+		bomb_request_name="eth_getBlock";
+		await bomb_requests();
+	}
+	else if(args.l){
+		bomb_request_name="web3_clientVersion";
 		await bomb_requests();
 	}
 	else if(args.t){

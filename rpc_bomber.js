@@ -164,22 +164,22 @@ async function bomb_transactions(){
                     nonce_counter++;
                 }
                 else if(ex.message.includes("Same transaction")){
-                    sleep(1000+i*10);
+                    await sleep(1000+i*10);
 				}
                 else if(ex.message.includes("timeout")){
                     timeout_counter++;
                 }
                 else if(ex.message.includes("hang up")){
                     hangup_counter++;
-                    sleep(1000+i*10);
+                    await sleep(1000+i*10);
                 }
                 else if(ex.message.includes("ECONNRESET")){
                     reset_counter++;
-                    sleep(1000+i);
+                    await sleep(1000+i);
                 }
                 else if(ex.message.includes("EADDRNOTAVAIL")){
                     notavail_counter++;
-                    sleep(1000+i);
+                    await sleep(1000+i);
                 }
                 else {
                     console.log(ex.message + " In account " + i + " retrying.");
@@ -195,7 +195,7 @@ async function bomb_transactions(){
 	
 	promises = []
 	for(var i in accounts){
-		sleep(1);
+		await sleep(1);
     	promises.push(submit(i));
     }
 
@@ -206,12 +206,9 @@ async function bomb_requests(){
 
     console.log("Bombing with " + bomb_request_name + " requests in batches of " + batch);
 
-	var recursive_batch;
 	var i = 0;
 	var error;
-
-	//submitLoad().then(function(){console.log("success");});
-	//return;
+	var in_progress = 0;    // track buffer size
 
     function eth_request(){
 		if(bomb_request_name=="eth_getBlock")
@@ -221,34 +218,34 @@ async function bomb_requests(){
 		else assert(false);
 	}
 
-	function recursive_batch(){		
+	while(true){
 		for(var j=0; j<batch; ++j){
+		    
+		    while(in_progress > 2*batch){
+		        console.log("\t"+in_progress + " requests in progress, waiting 1 sec");
+		        await sleep(1000);
+		    }
+		    
 			eth_request().then(function(res){
-				//console.log(res);
+				--in_progress;
 			}).catch(function(ex){
 				if(!error)
 				    console.log(ex.message);
 				error = true;
+				--in_progress;
 			});
+			++in_progress;
 		}// for
 		++i;
 	
 		console.log(i+" batches");
 		web3.eth.getBlockNumber().then(function(b){BN=b;}).catch(function(){});
 	
-		if(!error)
-			setImmediate( recursive_batch );
-		else{
+		if(error){
 			console.log("Exception: waiting 1 sec");
-			setTimeout( function(){
-				error = false;
-				recursive_batch();
-			}, 1000 );
+			await sleep(1000);
 		}
-	}// batch
-	
-	recursive_batch();
-	
+	}// while
 }
 
 async function main(){

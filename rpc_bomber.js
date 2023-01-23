@@ -160,8 +160,15 @@ async function bomb_transactions(){
                 //console.log(ex.message);
                 
                 if(ex.message.includes("nonce")){
-					nonces[i] = +await web3.eth.getTransactionCount(accounts[i].address);
-                    nonce_counter++;
+                    while(true){
+                        try{
+                            nonces[i] = +await web3.eth.getTransactionCount(accounts[i].address);
+                            nonce_counter++;
+                            break;
+                        }catch(ex){
+
+                        }// catch
+                    }// while
                 }
                 else if(ex.message.includes("Same transaction")){
                     await sleep(1000+i*10);

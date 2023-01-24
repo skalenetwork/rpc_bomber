@@ -16,6 +16,7 @@ let web3, chainId;
 let acc_count;
 let acc_from;
 let sockets;
+let data_size;
 
 let BN = 1;		// for bomb_requests
 let batch;
@@ -93,6 +94,15 @@ async function bomb_transactions(){
 	    	accounts.push( web3.eth.accounts.privateKeyToAccount( keys[i+acc_from] ) );
 	console.log("OK");
 
+	console.log("Preparing " + data_size + " transaction data");
+	let data = "0x";
+	for(let i=0; i<keys.length; ++i){
+		if((data.length-2)/2 >= data_size)
+			break;
+		data += keys[i].substr(2);
+	}
+	console.log("Data length " + (data.length-2)/2 + " OK");
+
 	let nonces = [];
 	let incr=[];
 
@@ -136,8 +146,9 @@ async function bomb_transactions(){
 			'chainId': chainId,
 			'to': accounts[i]['address'],
 			'value': '0',
-			'gas': 21000,
-			'gasPrice': '100000'
+			'gas': 21000+(data.length-2)*2*17,	// strange!?
+			'gasPrice': '100000',
+			'data': data
 		};
 		//console.log(tr);
 		signed  = await web3.eth.accounts.signTransaction( tr, accounts[i].privateKey );
@@ -267,6 +278,7 @@ async function main(){
 	rt_group.add_argument('-l', {help: "bomb endpoint with light requests: web3_clientVersion", action: 'store_true'});
 	parser.add_argument('-a', '--accounts', {help: "number of accounts to use (<=24000)", default:1000});
 	parser.add_argument('--from', {help: "starting account number (<24000)", default:0});
+	parser.add_argument('-d', {help: "transaction payload data size in bytes(<=768000)", default:0});
 	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel", default:1000});
 	parser.add_argument('-s', '--sockets', {help: "number of keepalive-sockets", default:1000000});
 	parser.add_argument('url', {help: "endpoint URL to connect to (http://ip:port)"});
@@ -289,7 +301,9 @@ async function main(){
 	acc_count = +args.accounts;
 		
 	acc_from = +args.from;
-	
+
+	data_size = +args.d;
+
 	batch = +args.batch;
 
 	let provider_options = {

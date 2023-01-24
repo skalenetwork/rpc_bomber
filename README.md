@@ -24,13 +24,15 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -r                    bomb endpoint with getBlock requests
+  -r                    bomb endpoint with eth_getBlock requests
   -t                    bomb endpoint with transactions
+  -l                    bomb endpoint with light requests: web3_clientVersion
   -a ACCOUNTS, --accounts ACCOUNTS
                         number of accounts to use (<=24000)
   --from FROM           starting account number (<24000)
+  -d D                  transaction payload data size in bytes(<=768000)
   -b BATCH, --batch BATCH
-                        number of getBlock requests executed in parallel
+                        number of requests executed in parallel
   -s SOCKETS, --sockets SOCKETS
                         number of keepalive-sockets
 ```

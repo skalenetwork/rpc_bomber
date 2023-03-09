@@ -17,6 +17,7 @@ let acc_count;
 let acc_from;
 let sockets;
 let data_size;
+let time_limit;
 
 let BN = 1;		// for bomb_requests
 let batch;
@@ -161,6 +162,7 @@ async function bomb_transactions(){
             incr[nonces[i]]++;
             ++nonces[i];
             stats();
+
             //return;
         }catch(ex){
         	    all_counter++;
@@ -196,11 +198,11 @@ async function bomb_transactions(){
                 }
                 else if(ex.message.includes("ECONNRESET")){
                     reset_counter++;
-                    await sleep(1000+i);
+                    await sleep(1000+i*10);
                 }
                 else if(ex.message.includes("EADDRNOTAVAIL")){
                     notavail_counter++;
-                    await sleep(1000+i);
+                    await sleep(1000+i*10);
                 }
                 else {
                     console.log(ex.message + " In account " + i + " retrying.");
@@ -211,6 +213,9 @@ async function bomb_transactions(){
 				//break;
 		}
 		
+		if(Date.now()-time_start>=time_limit)
+			break;
+
 		}//while
 	}
 	
@@ -226,6 +231,7 @@ async function bomb_transactions(){
 async function bomb_requests(){
 
     console.log("Bombing with " + bomb_request_name + " requests in batches of " + batch);
+	let time_start = Date.now();
 
 	var i = 0;
 	var error;
@@ -266,6 +272,9 @@ async function bomb_requests(){
 			console.log("Exception: waiting 1 sec");
 			await sleep(1000);
 		}
+
+		if(Date.now()-time_start>=time_limit)
+			break;
 	}// while
 }
 
@@ -284,12 +293,15 @@ async function main(){
 	parser.add_argument('-d', {help: "transaction payload data size in bytes(<=768000)", default:0});
 	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel", default:1000});
 	parser.add_argument('-s', '--sockets', {help: "number of keepalive-sockets", default:1000000});
+	parser.add_argument('--time', {help: "How many seconds to run", default:-1});
 	parser.add_argument('url', {help: "endpoint URL to connect to (http://ip:port)"});
 
 	let args=parser.parse_args();
 
 	sockets = +args.sockets;
 	console.log("Using maximum " + sockets + " sockets");
+
+	time_limit = +args.time;
 
 	agent = new http.Agent({
 		    	keepAlive: true,

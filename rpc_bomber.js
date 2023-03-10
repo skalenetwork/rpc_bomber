@@ -213,7 +213,7 @@ async function bomb_transactions(){
 				//break;
 		}
 		
-		if(Date.now()-start_time>=time_limit)
+		if(Date.now()-start_time>=time_limit*1000)
 			break;
 
 		}//while
@@ -273,7 +273,7 @@ async function bomb_requests(){
 			await sleep(1000);
 		}
 
-		if(Date.now()-time_start>=time_limit)
+		if(Date.now()-time_start>=time_limit*1000)
 			break;
 	}// while
 }

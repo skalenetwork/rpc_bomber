@@ -213,7 +213,7 @@ async function bomb_transactions(){
 				//break;
 		}
 		
-		if(Date.now()-time_start>=time_limit)
+		if(Date.now()-start_time>=time_limit)
 			break;
 
 		}//while
@@ -291,7 +291,7 @@ async function main(){
 	parser.add_argument('-a', '--accounts', {help: "number of accounts to use (<=24000)", default:1000});
 	parser.add_argument('--from', {help: "starting account number (<24000)", default:0});
 	parser.add_argument('-d', {help: "transaction payload data size in bytes(<=768000)", default:0});
-	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel", default:1000});
+	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel (-r only)", default:1000});
 	parser.add_argument('-s', '--sockets', {help: "number of keepalive-sockets", default:1000000});
 	parser.add_argument('--time', {help: "How many seconds to run", default:-1});
 	parser.add_argument('url', {help: "endpoint URL to connect to (http://ip:port)"});

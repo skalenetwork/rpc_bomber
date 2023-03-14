@@ -138,10 +138,10 @@ async function bomb_transactions(){
 	
 	async function submit(i){
 	    
-	    while(true){
-	    
 	    let start_time = Date.now();
-	    
+
+	    while(true){
+
 		tr = {
 			'nonce': web3.utils.toHex( nonces[i] ),
 			'chainId': chainId,
@@ -153,7 +153,7 @@ async function bomb_transactions(){
 		};
 		//console.log(tr);
 		signed  = await web3.eth.accounts.signTransaction( tr, accounts[i].privateKey );
-		
+
 		try{
             await client.timeout(60000).request("eth_sendRawTransaction", [signed.rawTransaction]);
             all_counter++;
@@ -212,9 +212,11 @@ async function bomb_transactions(){
                 //submit(i);
 				//break;
 		}
-		
-		if(Date.now()-start_time>=time_limit*1000)
+
+		if(Date.now()-start_time>=time_limit*1000){
+			console.log("Time limit reached, exiting");
 			break;
+		}
 
 		}//while
 	}

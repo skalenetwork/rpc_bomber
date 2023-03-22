@@ -17,7 +17,7 @@ let acc_count;
 let acc_from;
 let sockets;
 let data_size;
-let time_limit;
+let time_limit=Infinity;
 
 let BN = 1;		// for bomb_requests
 let batch;

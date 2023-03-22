@@ -295,7 +295,7 @@ async function main(){
 	parser.add_argument('-d', {help: "transaction payload data size in bytes(<=768000)", default:0});
 	parser.add_argument('-b', '--batch', {help: "number of requests executed in parallel (-r only)", default:1000});
 	parser.add_argument('-s', '--sockets', {help: "number of keepalive-sockets", default:1000000});
-	parser.add_argument('--time', {help: "How many seconds to run", default:-1});
+	parser.add_argument('--time', {help: "How many seconds to run", default:Infinity});
 	parser.add_argument('url', {help: "endpoint URL to connect to (http://ip:port)"});
 
 	let args=parser.parse_args();
